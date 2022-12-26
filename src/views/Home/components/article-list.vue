@@ -29,7 +29,7 @@
   
   <script>
   import {loadArticlesList} from '@/api/channel'
-  import ArticleItem from '@/components/index.vue'
+  import ArticleItem from '@/components/article-item/index.vue'
   export default {
     name: 'ArticleList',
     components: {ArticleItem},

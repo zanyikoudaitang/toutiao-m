@@ -9,12 +9,13 @@
         size="small"
         round
         icon="search"
+        to='/Search'
       >搜索</van-button>
     </van-nav-bar>
     <!-- /导航栏 -->
-    <van-tabs class="channel-tabs" swipeable animated sticky>
+    <van-tabs v-model="active" class="channel-tabs" swipeable animated sticky>
     <template #nav-right>
-      <div class="hamburger-btn">
+      <div class="hamburger-btn" @click="isChannelEditShow = true">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </template>
@@ -27,25 +28,44 @@
       </van-tab>
     </van-tabs>
 
+
+    <!-- 频道编辑 -->
+    <van-popup
+      v-model="isChannelEditShow"
+      position="right"
+      closeable
+      close-icon-position="top-left"
+      :style="{ height: '100%' }"
+    >
+    <ChannelEdit :active="active" :myChannels="channels" @updateActive="updateActive" />
+    </van-popup>
   </div>
   </template>
   
   <script>
   import {getUserChannels} from '@/api/login'
+  import { mapState } from 'vuex'
+  import { getItem, setItem } from '@/utils/storage'
   import ArticleList from './components/article-list.vue'
+  import ChannelEdit from './components/channel-edit.vue'
 
   export default {
     name: 'HomeIndex',
     components: {
-      ArticleList
+      ArticleList,
+      ChannelEdit
     },
     props: {},
     data () {
       return {
-        channels:{}
+        active:0,
+        channels:[],
+        isChannelEditShow: false
       }
     },
-    computed: {},
+    computed: {
+      ...mapState(['user'])
+    },
     watch: {},
     created () {
       this.loadUserChannels()
@@ -54,14 +74,26 @@
     methods: {
       async loadUserChannels (){
         try{
-          const ret = await getUserChannels();
-          this.channels = ret.data.data.channels;
+          const localUserChannels = getItem('TOUTIAO-CHANNELS')
+          if(this.$store.state.user || !localUserChannels){
+            const ret = await getUserChannels();
+            this.channels = ret.data.data.channels;
+          }else{
+            this.channels = localUserChannels
+          }
+          
         }catch(e){
           console.log(e)
           this.$toast.fail('获取用户频道列表失败')
         }
 
-      }
+      },
+      updateActive(index,flag=false){
+        //console.log(index)
+        this.active = index
+        this.isChannelEditShow = flag
+
+      },
     }
   }
   </script>
