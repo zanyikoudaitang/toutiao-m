@@ -104,7 +104,10 @@
     <!-- /底部区域 -->
 
     <!-- 评论列表 -->
-    <CommentList :list="commentLists" :source="article.art_id" />
+    <CommentList 
+    :list="commentLists" 
+    :source="article.art_id" 
+    @replyClick="onReplyClick" />
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -127,10 +130,19 @@
           v-model="isPostShow"
           position="bottom"
       >
-      <CommentPost :target="article.art_id" @isPostShow="isPostShow = !isPostShow" @onPostComment="onPostComment"></CommentPost>
+      <CommentPost  :target="article.art_id" @isPostShow="isPostShow = !isPostShow" @onPostComment="onPostComment"></CommentPost>
       </van-popup>
     </div>
 
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      closeable
+      close-icon-position="top-left"
+      :style="{height: '100%'}"
+    >
+    <CommentReply v-if="isReplyShow" :comment="currentComment"></CommentReply>
+    </van-popup>
    
   </div>
 </template>
@@ -145,6 +157,8 @@
   import CommentPost from './components/comment-post.vue'
 
   import CommentList from './components/comment-list.vue'
+
+  import CommentReply from "./components/comment-reply.vue";
   // ImagePreview({
   // images: [
   //   'https://img01.yzcdn.cn/vant/apple-1.jpg',
@@ -160,6 +174,7 @@
       likeArticle,
       CommentList,
       CommentPost,
+      CommentReply,
     }, 
    
     data () {
@@ -170,8 +185,14 @@
         error: '',
         totalCommentCount:'',
         isPostShow:false,
-
+        isReplyShow:false,
+        currentComment:{},
         
+      }
+    },
+    provide(){
+      return {
+        articleId:this.articleId
       }
     },
     props:{
@@ -226,8 +247,12 @@
       },
       onPostComment(comment){
         this.commentLists.unshift(comment);
-                this.$toast.success('发布成功')
+        this.$toast.success('发布成功')
         this.totalCommentCount++
+      },
+      onReplyClick(comment){
+        this.currentComment = comment
+        this.isReplyShow = true
       }
       
     }

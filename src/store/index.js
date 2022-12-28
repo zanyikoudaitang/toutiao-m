@@ -6,7 +6,8 @@ const TOUTIAO_USER = "toutiao_user"
 export default new Vuex.Store({
   state: {
     user:getItem('toutiao_user') ,//标识用户的token
-    userName : ''
+    userName : '',
+    
   },
   getters: {
   },

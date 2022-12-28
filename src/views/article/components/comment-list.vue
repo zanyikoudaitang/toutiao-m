@@ -5,6 +5,7 @@
       finished-text="没有更多了"
       :error.sync="error"
       error-text="请求失败，点击重新加载"
+      :immediate-check="false"
       @load="onLoad"
     >
       <!-- <van-cell
@@ -15,7 +16,8 @@
       <CommentItem 
         v-for="item in list"
         :key="item.com_id"
-        :comment="item"  
+        :comment="item" 
+        @replyClick="$emit('replyClick',$event)" 
       ></CommentItem>
     </van-list>
   </template>
@@ -29,6 +31,13 @@
       CommentItem
     },
     props: { 
+      type:{
+        type:String,
+        default:'a',
+        validator(value){
+          return ['a','c'].includes(value)
+        }
+      },  
       source:{
           type: [Number,String,Object],
           required: true,
@@ -49,6 +58,7 @@
     computed: {},
     watch: {},
     created() {
+      this.loading = true
       this.onLoad()
     },
     mounted() {},
@@ -58,9 +68,9 @@
         // setTimeout 仅做示例，真实场景中一般为 ajax 请求
         try{
           const ret = await getComments({
-            type:'a',
+            type:this.type,
             source: this.source,
-            offset : '',
+            offset : this.offset,
             limit: 10
           })
           this.list.push(...(ret?.data?.data?.results || []))
@@ -97,6 +107,9 @@
             this.finished = true;
           }
         }, 1000);*/
+      },
+      fn(){
+        
       }
     }
   };

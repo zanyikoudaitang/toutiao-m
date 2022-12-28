@@ -47,12 +47,12 @@
                 const ret = await postComment({
                     target:this.target,
                     content:this.message,
-                    art_id:''
+                    art_id:this.$route.params.articleId === this.target ? '' : this.$route.params.articleId
                 })
                 this.loading = false;
                 this.$emit('isPostShow')
-                this.$emit('onPostComment',ret.data.data.new_obj
-)
+                this.$emit('onPostComment',ret.data.data.new_obj)
+                
                 this.$toast.success('发布成功')
                 console.log(ret)
             }catch(e){
